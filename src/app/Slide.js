@@ -45,7 +45,9 @@ export class Slide extends View {
     }
 
     enter(cb) {
+        this.haltPosition();
         this.model.isVisible = true;
+
         if(cb instanceof Function) {
             this.setPositionX(0, this.model.enterTransition.transitionable, cb);
         } else {
@@ -54,7 +56,9 @@ export class Slide extends View {
     }
 
     exit(cb) {
+        this.haltPosition();
         this.model.isVisible = false;
+
         if(cb instanceof Function) {
             this.setPositionX(window.innerWidth, this.model.exitTransition.transitionable, cb);
         } else {

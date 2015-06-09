@@ -7,6 +7,7 @@ export class Controls extends View {
         this.renderPreviousbutton();
         this.renderNextbutton();
         this.renderSlideProgress();
+        this.setKeyPressEvents();
     }
 
     renderNextbutton() {
@@ -25,7 +26,7 @@ export class Controls extends View {
         this.nextButton.node.addUIEvent('mousedown');
         this.nextButton.node.onReceive = (type, ev) => {
             if (type === 'mousedown') {
-                this.previousButton.node.emit('nextSlide', ev);
+                this.nextButton.node.emit('nextSlide', ev);
             }
             this.nextButton.node.receive(type, ev);
         };
@@ -56,5 +57,22 @@ export class Controls extends View {
 
     renderSlideProgress() {
         this.slideProgress = new View(this.addChild());
+    }
+
+    setKeyPressEvents() {
+        window.addEventListener('keyup', (e) => {
+            console.log('e',e);
+
+            switch (e.keyCode) {
+                case 37: //Right arrow pushed
+                    this.previousButton.node.emit('previousSlide', e);
+                    console.log('previous slide');
+                    break;
+                case 39: //Left arrow pushed
+                    console.log('next slide');
+                    this.nextButton.node.emit('nextSlide', e);
+                    break;
+            }
+        });
     }
 }

@@ -12,8 +12,6 @@ class App extends View {
     constructor(node) {
         super(node);
 
-        console.log('ResizeObserver',ResizeObserver);
-
         let camera = new FamousPlatform.components.Camera(this.node);
         camera.setDepth(1000);
 
