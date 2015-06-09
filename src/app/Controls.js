@@ -61,15 +61,11 @@ export class Controls extends View {
 
     setKeyPressEvents() {
         window.addEventListener('keyup', (e) => {
-            console.log('e',e);
-
             switch (e.keyCode) {
                 case 37: //Right arrow pushed
                     this.previousButton.node.emit('previousSlide', e);
-                    console.log('previous slide');
                     break;
                 case 39: //Left arrow pushed
-                    console.log('next slide');
                     this.nextButton.node.emit('nextSlide', e);
                     break;
             }
