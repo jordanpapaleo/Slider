@@ -5,7 +5,7 @@ const Curves            = FamousPlatform.transitions.Curves;
 
 /* A slide is really just a container for content that can be manipulated.  It is not a DOM element */
 export class Slide extends View {
-    constructor(node, model, content) {
+    constructor(node, model) {
         super(node);
 
         this.model = model || {};
@@ -25,21 +25,23 @@ export class Slide extends View {
                 duration: 1000
             };
         }
+
+        this.addChild(this.model.content);
     }
 
     enter(cb) {
         if(cb instanceof Function) {
-            this.setOpacity(1, this.model.enterTransition, cb);
+            this.setPositionX(0, this.model.enterTransition, cb);
         } else {
-            this.setOpacity(1, this.model.enterTransition);
+            this.setPositionX(0, this.model.enterTransition);
         }
     }
 
     exit(cb) {
         if(cb instanceof Function) {
-            this.setOpacity(0, this.model.exitTransition, cb);
+            this.setPositionX(window.innerWidth, this.model.exitTransition, cb);
         } else {
-            this.setOpacity(0, this.model.exitTransition);
+            this.setPositionX(window.innerWidth, this.model.exitTransition);
         }
     }
 }

@@ -22,9 +22,13 @@ export class Controls extends View {
             }
         });
 
-        this.nextButton.on('mousedown', () => {
-            this.trigger('nextSlide');
-        });
+        this.nextButton.node.addUIEvent('mousedown');
+        this.nextButton.node.onReceive = (type, ev) => {
+            if (type === 'mousedown') {
+                this.previousButton.node.emit('nextSlide', ev);
+            }
+            this.nextButton.node.receive(type, ev);
+        };
     }
 
     renderPreviousbutton() {
@@ -40,9 +44,14 @@ export class Controls extends View {
             }
         });
 
-        this.previousButton.on('mousedown', () => {
-            this.trigger('previousSlide');
-        });
+        this.previousButton.node.addUIEvent('mousedown');
+        this.previousButton.node.onReceive = (type, ev) => {
+            if (type === 'mousedown') {
+                this.previousButton.node.emit('previousSlide', ev);
+            }
+
+            this.previousButton.node.receive(type, ev);
+        };
     }
 
     renderSlideProgress() {

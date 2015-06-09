@@ -5,12 +5,7 @@ import {Controls}       from './Controls';
 
 //Famous Components
 const Curves            = FamousPlatform.transitions.Curves;
-const Famous            = FamousPlatform.core.Famous;
-
-//GL Components
-const AmbientLight      = FamousPlatform.webglRenderables.AmbientLight;
-const Color             = FamousPlatform.utilities.Color;
-const PointLight        = FamousPlatform.webglRenderables.PointLight;
+const Node              = FamousPlatform.core.Node;
 
 class App extends View {
     constructor(node) {
@@ -22,10 +17,9 @@ class App extends View {
         this.setAlign(.5, .5).setMountPoint(.5, .5);
         this.setSizeModeRelative().setProportionalSize(1, 1);
 
-        this.clock = FamousPlatform.core.FamousEngine.getClock();
-
         this.initSlides();
         this.setEvents();
+        this.startSlideShow();
 
         this.controls = new Controls(this.addChild());
     }
@@ -33,20 +27,27 @@ class App extends View {
     initSlides() {
         this.slides = [];
 
-        let slides = ['yellow', 'orange', 'blue', 'pink', 'red'];
+        let template = require('./data/slides.html');
+        let dom = document.createElement('div');
+        dom.innerHTML = template;
+        let slides = dom.querySelectorAll('slide');
 
         let transitionable = {
             curve: Curves.linear,
             duration: 2000
         };
+        let windowWidth = window.innerWidth;
 
-        //let activeSlideIndex = 2;
+        for(let i = 0, j = slides.length; i < j; i++) {
+            //Put html content into a view
+            let content = new View(new Node());
+            content.createDOMElement({
+                content: slides[i].innerHTML
+            });
 
-        // Loop over content for a slide and place it in a slide
-        // I think I should be able to pass a node/content so the slide doesnt need know anything about the content, just its behavior
-        slides.forEach((content, i) => {
             let model = {
                 i,
+                content: content.node,
                 exitTransition: {
                     transitionable
                 },
@@ -55,21 +56,27 @@ class App extends View {
                 }
             };
 
-            let slide = new Slide(this.addChild(), model, content);
-/*
-            if(i === activeSlideIndex) {
-                slide.setPosition(0, 0, 0);
-            } else {
-                slide.setPosition(window.innerWidth, 0, 0)
-            }*/
+            let slide = new Slide(this.addChild(), model);
+
+            if(i !== 0) {
+                slide.setOpacity(0);
+                slide.setPositionX(windowWidth);
+            }
 
             this.slides.push(slide);
-        });
+        }
     }
 
     setEvents() {
-        this.on('nextSlide', this._nextSlide());
-        this.on('previousSlide', this._previousSlide());
+        this.node.onReceive = (type, ev) => {
+            if (type === 'nextSlide') {
+                this._nextSlide(ev);
+            } else if(type === 'previousSlide') {
+                this._previousSlide(ev)
+            }
+
+            this.node.receive(type, ev);
+        };
     }
 
     startSlideShow() {
@@ -78,28 +85,38 @@ class App extends View {
         this.currentSlide.enter();
     }
 
-    _nextSlide() {
-        console.log('next slide');
+    _nextSlide(ev) {
         if(!this.hasStarted) return;
 
-        this.nextSlide = this.slides[this.currentSlide.model.i + 1];  //TODO make sure slide exists
-        this.currentSlide.exit();
-        this.nextSlide.enter();
+        if(this.currentSlide.model.i + 1 < this.slides.length) {
+            this.nextSlide = this.slides[this.currentSlide.model.i + 1];
+            this.currentSlide.exit(function() {
+                console.info('_nextSlide: current exited');
+            });
+            this.nextSlide.enter(function() {
+                console.info('_nextSlide: next entered');
+            });
 
-        this.currentSlide = this.nextSlide();
-        delete this.nextSlide;
+            this.currentSlide = this.nextSlide;
+            delete this.nextSlide;
+        }
     }
 
-    _previousSlide() {
-        console.log('previous slide');
+    _previousSlide(ev) {
         if(!this.hasStarted) return;
 
-        this.previousSlide = this.slides[this.currentSlide.model.i - 1]; //TODO make sure slide exists
-        this.currentSlide.exit();
-        this.previousSlide.enter();
+        if(this.currentSlide.model.i - 1 >= 0 ) {
+            this.previousSlide = this.slides[this.currentSlide.model.i - 1];
+            this.currentSlide.exit(function() {
+                console.info('_previousSlide: next exited');
+            });
+            this.previousSlide.enter(function() {
+                console.info('_previousSlide: next entered');
+            });
 
-        this.currentSlide = this.previousSlide();
-        delete this.previousSlide;
+            this.currentSlide = this.previousSlide;
+            delete this.previousSlide
+        }
     }
 }
 
