@@ -2,6 +2,7 @@ import View             from 'famous-creative/display/View';
 import FamousEngine     from 'famous-creative/scaffolding/FamousEngine';
 import {Slide}          from './Slide';
 import {Controls}       from './Controls';
+import ResizeObserver   from './ResizeObserver';
 
 //Famous Components
 const Curves            = FamousPlatform.transitions.Curves;
@@ -10,6 +11,8 @@ const Node              = FamousPlatform.core.Node;
 class App extends View {
     constructor(node) {
         super(node);
+
+        console.log('ResizeObserver',ResizeObserver);
 
         let camera = new FamousPlatform.components.Camera(this.node);
         camera.setDepth(1000);
@@ -33,13 +36,12 @@ class App extends View {
         let slides = dom.querySelectorAll('slide');
 
         let transitionable = {
-            curve: Curves.linear,
-            duration: 2000
+            curve: Curves.inOutBack,
+            duration: 1500
         };
-        let windowWidth = window.innerWidth;
 
         for(let i = 0, j = slides.length; i < j; i++) {
-            //Put html content into a view
+            //Put html content into a view to allow for manipulation if needed
             let content = new View(new Node());
             content.createDOMElement({
                 content: slides[i].innerHTML
@@ -47,6 +49,7 @@ class App extends View {
 
             let model = {
                 i,
+                isVisible: (i === 0),
                 content: content.node,
                 exitTransition: {
                     transitionable
@@ -59,8 +62,7 @@ class App extends View {
             let slide = new Slide(this.addChild(), model);
 
             if(i !== 0) {
-                slide.setOpacity(0);
-                slide.setPositionX(windowWidth);
+                slide.setPositionX(window.innerWidth);
             }
 
             this.slides.push(slide);
@@ -77,6 +79,12 @@ class App extends View {
 
             this.node.receive(type, ev);
         };
+
+        this.node.addComponent({
+            onSizeChange: (ev) => {
+                ResizeObserver.update(ev);
+            }
+        });
     }
 
     startSlideShow() {

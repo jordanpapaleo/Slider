@@ -1,4 +1,5 @@
 import View             from 'famous-creative/display/View';
+import ResizeObserver   from './ResizeObserver';
 
 //Famous Components
 const Curves            = FamousPlatform.transitions.Curves;
@@ -27,21 +28,37 @@ export class Slide extends View {
         }
 
         this.addChild(this.model.content);
+
+        this.setEvents();
+    }
+
+    setEvents() {
+        ResizeObserver.subscribe((ev) => {
+            this._reposition(ev);
+        });
+    }
+
+    _reposition(pos) {
+        if(!this.model.isVisible) {
+            this.setPositionX(pos[0]);
+        }
     }
 
     enter(cb) {
+        this.model.isVisible = true;
         if(cb instanceof Function) {
-            this.setPositionX(0, this.model.enterTransition, cb);
+            this.setPositionX(0, this.model.enterTransition.transitionable, cb);
         } else {
-            this.setPositionX(0, this.model.enterTransition);
+            this.setPositionX(0, this.model.enterTransition.transitionable);
         }
     }
 
     exit(cb) {
+        this.model.isVisible = false;
         if(cb instanceof Function) {
-            this.setPositionX(window.innerWidth, this.model.exitTransition, cb);
+            this.setPositionX(window.innerWidth, this.model.exitTransition.transitionable, cb);
         } else {
-            this.setPositionX(window.innerWidth, this.model.exitTransition);
+            this.setPositionX(window.innerWidth, this.model.exitTransition.transitionable);
         }
     }
 }
