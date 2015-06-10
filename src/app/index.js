@@ -23,7 +23,9 @@ class App extends View {
         this.setEvents();
         this.startSlideShow();
 
-        this.controls = new Controls(this.addChild());
+        this.controls = new Controls(this.addChild(), {
+            slideCount: this.slides.length
+        });
     }
 
     initSlides() {
@@ -55,18 +57,20 @@ class App extends View {
             slide.defineEntrance({
                 transition,
                 modifier: slide.position,
-                value: [0, 0, 0]
+                value: [0, 0, 0],
+                //value: [1]
             });
 
             slide.defineDeparture({
                 transition,
                 modifier: slide.position,
                 value: [(function() {return window.innerWidth;})(), 0, 0]
+                //value: [0]
             });
 
             //Exit every slide but the first one
             if(i !== 0) {
-                slide.departure.modifier.set(slide.departure.value);
+                slide.departure.modifier.set.apply(slide.departure.modifier, slide.departure.value);
             }
 
             this.slides.push(slide);
@@ -79,6 +83,8 @@ class App extends View {
                 this._nextSlide(ev);
             } else if(type === 'previousSlide') {
                 this._previousSlide(ev)
+            } else if(type === 'gotoSlide') {
+                this._gotoSlide(ev.n)
             }
 
             this.node.receive(type, ev);
@@ -103,13 +109,8 @@ class App extends View {
 
         if(this.currentSlide.model.i + 1 < this.slides.length) {
             this.nextSlide = this.slides[this.currentSlide.model.i + 1];
-            this.currentSlide.depart(function() {
-                console.info('_nextSlide: current exited');
-            });
-            this.nextSlide.enter(function() {
-                console.info('_nextSlide: next entered');
-            });
-
+            this.currentSlide.depart();
+            this.nextSlide.enter();
             this.currentSlide = this.nextSlide;
             delete this.nextSlide;
         }
@@ -120,15 +121,21 @@ class App extends View {
 
         if(this.currentSlide.model.i - 1 >= 0 ) {
             this.previousSlide = this.slides[this.currentSlide.model.i - 1];
-            this.currentSlide.depart(function() {
-                console.info('_previousSlide: next exited');
-            });
-            this.previousSlide.enter(function() {
-                console.info('_previousSlide: next entered');
-            });
-
+            this.currentSlide.depart();
+            this.previousSlide.enter();
             this.currentSlide = this.previousSlide;
             delete this.previousSlide
+        }
+    }
+
+    _gotoSlide(n) {
+        if(!this.hasStarted) return;
+
+        if(n >= 0 && n <= this.slides.length) {
+            this.currentSlide.depart();
+            let nextSlide = this.slides[n];
+            nextSlide.enter();
+            this.currentSlide = nextSlide;
         }
     }
 }

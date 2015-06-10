@@ -1,12 +1,15 @@
 import View             from 'famous-creative/display/View';
+import Modifier         from 'famous-creative/display/Modifier';
+//import Layout           from './helpers/LayoutService';
 
 export class Controls extends View {
-    constructor(node) {
+    constructor(node, model) {
         super(node);
 
+        this.model = model || {};
         this.renderPreviousbutton();
         this.renderNextbutton();
-        this.renderSlideProgress();
+        this.renderSlideNav();
         this.setKeyPressEvents();
     }
 
@@ -55,8 +58,43 @@ export class Controls extends View {
         };
     }
 
-    renderSlideProgress() {
-        this.slideProgress = new View(this.addChild());
+    renderSlideNav() {
+        const navWidth = 150;
+
+        this.slideNav = new Modifier(this.addChild());
+        this.slideNav.setAlign(.5, 1).setMountPoint(.5, 1);
+        this.slideNav.setSizeMode(1, 1).setAbsoluteSize(navWidth, 25);
+
+        //space between nodes
+        let totalPadding = (this.model.slideCount - 1)  * 10;
+        let linkSize = (navWidth - totalPadding) / this.model.slideCount;
+        let runningPos = 0;
+
+        for(let i = 0, j = this.model.slideCount; i < j; i++) {
+            let slideLink = new View(this.slideNav.addChild(), { i });
+
+            slideLink.setSizeMode(1, 0).setAbsoluteSize(linkSize).setProportionalSize(null, 1);
+            slideLink.setPositionX(runningPos);
+            runningPos += linkSize;
+
+            slideLink.createDOMElement({
+                tagName: 'a',
+                content: i + "",
+                classes: ['slide-link'],
+                properties: {
+                    'text-align': 'center'
+                }
+            });
+
+            slideLink.node.addUIEvent('mouseup');
+            slideLink.node.onReceive = (type, ev) => {
+                if (type === 'mouseup') {
+                    slideLink.node.emit('gotoSlide', i);
+                }
+
+                slideLink.node.receive(type, ev);
+            };
+        }
     }
 
     setKeyPressEvents() {

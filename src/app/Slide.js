@@ -45,13 +45,16 @@ export class Slide extends View {
     enter(cb) {
         this.model.isVisible = true;
         this.departure.modifier.halt();
+        console.log('',this.opacity);
 
-        let params = this.entrance.value;
+        let params = this.entrance.value.slice();
         params.push(this.entrance.transition);
 
         if(cb instanceof Function) {
             params.push(cb);
         }
+
+        console.log('enter params',params);
 
         this.entrance.modifier.set.apply(this.entrance.modifier, params);
     }
@@ -60,13 +63,14 @@ export class Slide extends View {
         this.entrance.modifier.halt();
         this.model.isVisible = false;
 
-        let params = this.departure.value;
+        let params = this.departure.value.slice();
         params.push(this.departure.transition);
 
         if(cb instanceof Function) {
-            //params.push(cb);
+            params.push(cb);
         }
 
+        console.log('depart params',params);
         this.departure.modifier.set.apply(this.departure.modifier, params);
     }
 }
