@@ -24,8 +24,7 @@ export class Observer {
             this.observable = observable;
             this.refresh();
             hasUpdated = true;
-        }
-        else {
+        } else {
             console.debug('Null observable');
         }
 

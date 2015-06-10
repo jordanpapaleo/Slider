@@ -3,7 +3,6 @@ import FamousEngine     from 'famous-creative/scaffolding/FamousEngine';
 import {Slide}          from './Slide';
 import {Controls}       from './Controls';
 import ResizeObserver   from './ResizeObserver';
-import MODIFIERS        from './MODIFIERS';
 
 //Famous Components
 const Curves            = FamousPlatform.transitions.Curves;
@@ -82,18 +81,17 @@ class App extends View {
             if (type === 'nextSlide') {
                 this._nextSlide(e);
             } else if(type === 'previousSlide') {
-                this._previousSlide(e)
+                this._previousSlide(e);
             } else if(type === 'gotoSlide') {
-                console.log('ev',e);
-                this._gotoSlide(e)
+                this._gotoSlide(e);
             }
 
             this.node.receive(type, e);
         };
 
         this.node.addComponent({
-            onSizeChange: (ev) => {
-                ResizeObserver.update(ev);
+            onSizeChange: (e) => {
+                ResizeObserver.update(e);
             }
         });
     }
@@ -106,7 +104,9 @@ class App extends View {
     }
 
     _nextSlide(e) {
-        if(!this.hasStarted) return;
+        if(!this.hasStarted) {
+            return;
+        }
 
         if(this.currentSlide.model.i + 1 < this.slides.length) {
             this.nextSlide = this.slides[this.currentSlide.model.i + 1];
@@ -118,20 +118,23 @@ class App extends View {
     }
 
     _previousSlide(e) {
-        if(!this.hasStarted) return;
+        if(!this.hasStarted) {
+            return;
+        }
 
         if(this.currentSlide.model.i - 1 >= 0 ) {
             this.previousSlide = this.slides[this.currentSlide.model.i - 1];
             this.currentSlide.depart();
             this.previousSlide.enter();
             this.currentSlide = this.previousSlide;
-            delete this.previousSlide
+            delete this.previousSlide;
         }
     }
 
     _gotoSlide(n) {
-        if(!this.hasStarted) return;
-        console.log('n',n);
+        if(!this.hasStarted) {
+            return;
+        }
 
         if(n >= 0 && n <= this.slides.length) {
             this.currentSlide.depart();
