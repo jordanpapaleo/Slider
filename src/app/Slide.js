@@ -66,7 +66,6 @@ export class Slide extends Modifier {
         this.entrance.modifier.halt();
         this.model.isVisible = false;
 
-        console.log(this.departure.value);
         let params = this.departure.value.slice();
         params.push(this.departure.transition);
 

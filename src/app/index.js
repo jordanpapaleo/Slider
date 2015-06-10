@@ -78,16 +78,17 @@ class App extends View {
     }
 
     setEvents() {
-        this.node.onReceive = (type, ev) => {
+        this.node.onReceive = (type, e) => {
             if (type === 'nextSlide') {
-                this._nextSlide(ev);
+                this._nextSlide(e);
             } else if(type === 'previousSlide') {
-                this._previousSlide(ev)
+                this._previousSlide(e)
             } else if(type === 'gotoSlide') {
-                this._gotoSlide(ev.n)
+                console.log('ev',e);
+                this._gotoSlide(e)
             }
 
-            this.node.receive(type, ev);
+            this.node.receive(type, e);
         };
 
         this.node.addComponent({
@@ -104,7 +105,7 @@ class App extends View {
         this.currentSlide.enter();
     }
 
-    _nextSlide(ev) {
+    _nextSlide(e) {
         if(!this.hasStarted) return;
 
         if(this.currentSlide.model.i + 1 < this.slides.length) {
@@ -116,7 +117,7 @@ class App extends View {
         }
     }
 
-    _previousSlide(ev) {
+    _previousSlide(e) {
         if(!this.hasStarted) return;
 
         if(this.currentSlide.model.i - 1 >= 0 ) {
@@ -130,6 +131,7 @@ class App extends View {
 
     _gotoSlide(n) {
         if(!this.hasStarted) return;
+        console.log('n',n);
 
         if(n >= 0 && n <= this.slides.length) {
             this.currentSlide.depart();
