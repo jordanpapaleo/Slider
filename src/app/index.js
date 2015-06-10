@@ -3,6 +3,7 @@ import FamousEngine     from 'famous-creative/scaffolding/FamousEngine';
 import {Slide}          from './Slide';
 import {Controls}       from './Controls';
 import ResizeObserver   from './ResizeObserver';
+import MODIFIERS        from './MODIFIERS';
 
 //Famous Components
 const Curves            = FamousPlatform.transitions.Curves;
@@ -22,7 +23,9 @@ class App extends View {
         this.setEvents();
         this.startSlideShow();
 
-        this.controls = new Controls(this.addChild());
+        this.controls = new Controls(this.addChild(), {
+            slideCount: this.slides.length
+        });
     }
 
     initSlides() {
@@ -33,7 +36,7 @@ class App extends View {
         dom.innerHTML = template;
         let slides = dom.querySelectorAll('slide');
 
-        let transitionable = {
+        let transition = {
             curve: Curves.inOutBack,
             duration: 1500
         };
@@ -45,22 +48,29 @@ class App extends View {
                 content: slides[i].innerHTML
             });
 
-            let model = {
+            let slide = new Slide(this.addChild(), {
                 i,
                 isVisible: (i === 0),
-                content: content.node,
-                exitTransition: {
-                    transitionable
-                },
-                enterTransition: {
-                    transitionable
-                }
-            };
+                content: content.node
+            });
 
-            let slide = new Slide(this.addChild(), model);
+            slide.defineEntrance({
+                transition,
+                modifier: slide.position,
+                value: [0, 0, 0]
+                //value: [1]
+            });
 
+            slide.defineDeparture({
+                transition,
+                modifier: slide.position,
+                value: [window.innerWidth, 0, 0]
+                //value: [0]
+            });
+
+            //Exit every slide but the first one
             if(i !== 0) {
-                slide.setPositionX(window.innerWidth);
+                slide.departure.modifier.set.apply(slide.departure.modifier, slide.departure.value);
             }
 
             this.slides.push(slide);
@@ -73,6 +83,8 @@ class App extends View {
                 this._nextSlide(ev);
             } else if(type === 'previousSlide') {
                 this._previousSlide(ev)
+            } else if(type === 'gotoSlide') {
+                this._gotoSlide(ev.n)
             }
 
             this.node.receive(type, ev);
@@ -88,6 +100,7 @@ class App extends View {
     startSlideShow() {
         this.hasStarted = true;
         this.currentSlide = this.slides[0];
+
         this.currentSlide.enter();
     }
 
@@ -96,13 +109,8 @@ class App extends View {
 
         if(this.currentSlide.model.i + 1 < this.slides.length) {
             this.nextSlide = this.slides[this.currentSlide.model.i + 1];
-            this.currentSlide.exit(function() {
-                console.info('_nextSlide: current exited');
-            });
-            this.nextSlide.enter(function() {
-                console.info('_nextSlide: next entered');
-            });
-
+            this.currentSlide.depart();
+            this.nextSlide.enter();
             this.currentSlide = this.nextSlide;
             delete this.nextSlide;
         }
@@ -113,15 +121,21 @@ class App extends View {
 
         if(this.currentSlide.model.i - 1 >= 0 ) {
             this.previousSlide = this.slides[this.currentSlide.model.i - 1];
-            this.currentSlide.exit(function() {
-                console.info('_previousSlide: next exited');
-            });
-            this.previousSlide.enter(function() {
-                console.info('_previousSlide: next entered');
-            });
-
+            this.currentSlide.depart();
+            this.previousSlide.enter();
             this.currentSlide = this.previousSlide;
             delete this.previousSlide
+        }
+    }
+
+    _gotoSlide(n) {
+        if(!this.hasStarted) return;
+
+        if(n >= 0 && n <= this.slides.length) {
+            this.currentSlide.depart();
+            let nextSlide = this.slides[n];
+            nextSlide.enter();
+            this.currentSlide = nextSlide;
         }
     }
 }
