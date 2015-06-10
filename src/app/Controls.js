@@ -1,6 +1,5 @@
 import View             from 'famous-creative/display/View';
 import Modifier         from 'famous-creative/display/Modifier';
-//import Layout           from './helpers/LayoutService';
 
 export class Controls extends View {
     constructor(node, model) {
@@ -79,7 +78,7 @@ export class Controls extends View {
 
             slideLink.createDOMElement({
                 tagName: 'a',
-                content: i + "",
+                content: i + '',
                 classes: ['slide-link'],
                 properties: {
                     'text-align': 'center'

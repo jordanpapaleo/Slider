@@ -3,7 +3,6 @@ import FamousEngine     from 'famous-creative/scaffolding/FamousEngine';
 import {Slide}          from './Slide';
 import {Controls}       from './Controls';
 import ResizeObserver   from './ResizeObserver';
-import MODIFIERS        from './MODIFIERS';
 
 //Famous Components
 const Curves            = FamousPlatform.transitions.Curves;
@@ -78,21 +77,21 @@ class App extends View {
     }
 
     setEvents() {
-        this.node.onReceive = (type, ev) => {
+        this.node.onReceive = (type, e) => {
             if (type === 'nextSlide') {
-                this._nextSlide(ev);
+                this._nextSlide(e);
             } else if(type === 'previousSlide') {
-                this._previousSlide(ev)
+                this._previousSlide(e);
             } else if(type === 'gotoSlide') {
-                this._gotoSlide(ev.n)
+                this._gotoSlide(e);
             }
 
-            this.node.receive(type, ev);
+            this.node.receive(type, e);
         };
 
         this.node.addComponent({
-            onSizeChange: (ev) => {
-                ResizeObserver.update(ev);
+            onSizeChange: (e) => {
+                ResizeObserver.update(e);
             }
         });
     }
@@ -104,8 +103,10 @@ class App extends View {
         this.currentSlide.enter();
     }
 
-    _nextSlide(ev) {
-        if(!this.hasStarted) return;
+    _nextSlide(e) {
+        if(!this.hasStarted) {
+            return;
+        }
 
         if(this.currentSlide.model.i + 1 < this.slides.length) {
             this.nextSlide = this.slides[this.currentSlide.model.i + 1];
@@ -116,20 +117,24 @@ class App extends View {
         }
     }
 
-    _previousSlide(ev) {
-        if(!this.hasStarted) return;
+    _previousSlide(e) {
+        if(!this.hasStarted) {
+            return;
+        }
 
         if(this.currentSlide.model.i - 1 >= 0 ) {
             this.previousSlide = this.slides[this.currentSlide.model.i - 1];
             this.currentSlide.depart();
             this.previousSlide.enter();
             this.currentSlide = this.previousSlide;
-            delete this.previousSlide
+            delete this.previousSlide;
         }
     }
 
     _gotoSlide(n) {
-        if(!this.hasStarted) return;
+        if(!this.hasStarted) {
+            return;
+        }
 
         if(n >= 0 && n <= this.slides.length) {
             this.currentSlide.depart();

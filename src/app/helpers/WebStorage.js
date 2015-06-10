@@ -31,8 +31,7 @@ export class WebStorage {
             this.type = storageType;
 
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -50,7 +49,7 @@ export class WebStorage {
             }
 
             try {
-                if (angular.isObject(value) || angular.isArray(value)) {
+                if (typeof value === 'object' || Array.isArray(value)) {
                     value = this.serialize(value);
                 }
 
@@ -61,9 +60,8 @@ export class WebStorage {
                 this.webStorage.setItem(key, value);
 
                 return true;
-            }
-            catch (error) {
-                console.error("Unable to save key " + key + " to " + this.type);
+            } catch (error) {
+                console.error('Unable to save key ' + key + ' to ' + this.type);
                 return false;
             }
         }
@@ -83,10 +81,9 @@ export class WebStorage {
 
             try {
                 value = this.webStorage.getItem(key);
-            }
-            catch (error) {
-                console.error("Error attempting to get key " + key + " from " + this.type);
-                throw new Error("Unable to get stored preference");
+            } catch (error) {
+                console.error('Error attempting to get key ' + key + ' from ' + this.type);
+                throw new Error('Unable to get stored preference');
             }
 
             if (!value) {
@@ -95,8 +92,8 @@ export class WebStorage {
 
             if (value !== null) {
                 value = this.decode(value);
-                //console.info("decoded value is " + value);
-                if ((value.charAt(0) === "{") || (value.charAt(0) === "[")) {
+                //console.info('decoded value is ' + value);
+                if ((value.charAt(0) === '{') || (value.charAt(0) === '[')) {
                     value = this.deserialize(value);
                 }
             }
@@ -117,8 +114,7 @@ export class WebStorage {
 
         if (keyPrefix != null) {
             keyPrefixLength = keyPrefix.length;
-        }
-        else {
+        } else {
             keyPrefixLength = 0;
         }
 
@@ -128,10 +124,9 @@ export class WebStorage {
                     returnKeys.push(key.substr(keyPrefixLength));
                 }
             }
-        }
-        catch (error) {
-            // console.error("Error occurred getting all keys starting with " + keyPrefix);
-            throw new Error("Unable to read stored preferences.");
+        } catch (error) {
+            // console.error('Error occurred getting all keys starting with ' + keyPrefix);
+            throw new Error('Unable to read stored preferences.');
         }
 
         return returnKeys;
@@ -148,9 +143,8 @@ export class WebStorage {
                 this.webStorage.removeItem(key);
 
                 return true;
-            }
-            catch (error) {
-                console.error("Error occurred while trying to remove key " + key + " from " + this.type);
+            } catch (error) {
+                console.error('Error occurred while trying to remove key ' + key + ' from ' + this.type);
                 return false;
             }
         }
@@ -168,9 +162,8 @@ export class WebStorage {
                 this.webStorage.clear();
 
                 return true;
-            }
-            catch (error) {
-                console.error("Error occurred while trying to clear ALL data from " + this.type);
+            } catch (error) {
+                console.error('Error occurred while trying to clear ALL data from ' + this.type);
                 return false;
             }
         }

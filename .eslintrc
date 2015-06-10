@@ -29,7 +29,8 @@
     },
     "globals": {
         "AudioContext": true,
-        "FamousPlatform": true
+        "FamousPlatform": true,
+        "Base64": true
     },
     "parser": "babel-eslint",
     "rules": {

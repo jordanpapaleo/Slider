@@ -1,9 +1,8 @@
-import View             from 'famous-creative/display/View';
 import Modifier         from 'famous-creative/display/Modifier';
 import ResizeObserver   from './ResizeObserver';
 
 //Famous Components
-const Curves            = FamousPlatform.transitions.Curves;
+//const Curves            = FamousPlatform.transitions.Curves;
 const Position          = FamousPlatform.components.Position;
 
 /* A slide is really just a container for content that can be manipulated.  It is not a DOM element */
@@ -25,8 +24,8 @@ export class Slide extends Modifier {
     }
 
     setEvents() {
-        ResizeObserver.subscribe((ev) => {
-            this._reposition(ev);
+        ResizeObserver.subscribe((e) => {
+            this._reposition(e);
         });
     }
 
@@ -66,7 +65,6 @@ export class Slide extends Modifier {
         this.entrance.modifier.halt();
         this.model.isVisible = false;
 
-        console.log(this.departure.value);
         let params = this.departure.value.slice();
         params.push(this.departure.transition);
 
