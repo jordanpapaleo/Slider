@@ -57,14 +57,14 @@ class App extends View {
             slide.defineEntrance({
                 transition,
                 modifier: slide.position,
-                value: [0, 0, 0],
+                value: [0, 0, 0]
                 //value: [1]
             });
 
             slide.defineDeparture({
                 transition,
                 modifier: slide.position,
-                value: [(function() {return window.innerWidth;})(), 0, 0]
+                value: [window.innerWidth, 0, 0]
                 //value: [0]
             });
 
